@@ -11,11 +11,10 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('cards', function (Blueprint $table) {
+        Schema::create('fees', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('account_id')->constrained('accounts')->onDelete('cascade');
-            $table->string('card_number')->unique();
-            $table->bigInteger('balance')->default(0);
+            $table->foreignId('transaction_id')->constrained('transactions')->onDelete('cascade');
+            $table->bigInteger('amount');
             $table->timestamps();
             $table->softDeletes();
         });
@@ -26,6 +25,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('cards');
+        Schema::dropIfExists('fees');
     }
 };
