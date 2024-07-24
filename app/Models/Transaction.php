@@ -10,7 +10,7 @@ class Transaction extends Model
 {
     use HasFactory, SoftDeletes;
 
-    protected $fillable = ['source_card_id', 'destination_card_id', 'amount', 'fee'];
+    protected $fillable = ['source_card_id', 'destination_card_id', 'amount'];
 
     public function sourceCard(): \Illuminate\Database\Eloquent\Relations\BelongsTo
     {
