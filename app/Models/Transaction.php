@@ -22,4 +22,9 @@ class Transaction extends Model
         return $this->belongsTo(Card::class, 'destination_card_id');
     }
 
+    public function fee(): \Illuminate\Database\Eloquent\Relations\HasOne
+    {
+        return $this->hasOne(Fee::class);
+    }
+
 }
