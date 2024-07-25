@@ -11,9 +11,12 @@ class KavenegarSMSProvider implements SmsInterface
 {
     protected $api;
 
+
+    const SUCCESS_STATUS = 1;
+    const SENDER_ID = '12345';
+
     public function __construct()
     {
-        //api key is read from the .env file in Laravel.
         $this->api = new KavenegarApi(env('KAVENEGAR_API_KEY'));
     }
 
@@ -21,14 +24,9 @@ class KavenegarSMSProvider implements SmsInterface
     {
         try {
 
-            $sender = "12345" ;
+            $response = $this->api->Send(self::SENDER_ID, $to, $message);
 
-            $response = $this->api->Send($sender, $to, $message);
-            if (isset($response[0]->status) && $response[0]->status == 1) {
-                return true;
-            }
-            Log::error('Kavenegar API error: ' . $response[0]->status);
-            return false;
+            return $response[0]?->status === self::SUCCESS_STATUS;
         } catch (ApiException|HttpException $e) {
             Log::error('Kavenegar API Exception: ' . $e->getMessage());
             return false;

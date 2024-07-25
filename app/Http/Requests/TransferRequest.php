@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests;
 
+use App\Constants\TransactionConst;
 use App\Helpers\NumberHelper;
 use App\Rules\CardNumberRule;
 use Illuminate\Foundation\Http\FormRequest;
@@ -26,7 +27,7 @@ class TransferRequest extends FormRequest
         return [
             'source_card_number' => ['required', new CardNumberRule()],
             'destination_card_number' => ['required', new CardNumberRule()],
-            'amount' => 'required|integer|min:1000|max:50000000',
+            'amount' => 'required|integer|min:'.TransactionConst::MIN_TRANSFER_AMOUNT.'|max:'.TransactionConst::MAX_TRANSFER_AMOUNT,
         ];
     }
 

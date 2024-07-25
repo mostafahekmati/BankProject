@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Transaction extends Model
@@ -12,12 +13,12 @@ class Transaction extends Model
 
     protected $fillable = ['source_card_id', 'destination_card_id', 'amount'];
 
-    public function sourceCard(): \Illuminate\Database\Eloquent\Relations\BelongsTo
+    public function sourceCard(): BelongsTo
     {
         return $this->belongsTo(Card::class, 'source_card_id');
     }
 
-    public function destinationCard(): \Illuminate\Database\Eloquent\Relations\BelongsTo
+    public function destinationCard(): BelongsTo
     {
         return $this->belongsTo(Card::class, 'destination_card_id');
     }
@@ -25,6 +26,18 @@ class Transaction extends Model
     public function fee(): \Illuminate\Database\Eloquent\Relations\HasOne
     {
         return $this->hasOne(Fee::class);
+    }
+
+    public static function createTransaction($sourceCardId, $destinationCardId, $amount)
+    {
+        $transaction = self::create([
+            'source_card_id' => $sourceCardId,
+            'destination_card_id' => $destinationCardId,
+            'amount' => $amount,
+        ]);
+
+
+        return $transaction;
     }
 
 }
