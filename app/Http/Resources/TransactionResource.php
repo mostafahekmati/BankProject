@@ -18,7 +18,7 @@ class TransactionResource extends JsonResource
             'transaction_id' => $this->id,
             'source_card_id' => $this->source_card_id,
             'destination_card_id' => $this->destination_card_id,
-            'amount' => $this->amount,
+            'amount' => number_format($this->amount, 2, '.', ','),
             'created_at' => $this->created_at,
         ];
     }

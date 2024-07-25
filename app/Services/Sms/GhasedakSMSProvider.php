@@ -5,20 +5,16 @@ namespace App\Services\Sms;
 class GhasedakSMSProvider implements SmsInterface
 {
 
-//    protected $api;
-//
-//    public function __construct()
-//    {
-//        $this->api = new GhasedakApi(env('GHASEDAK_API_KEY'));
-//    }
 
     public function sendSMS(string $to, string $message): bool
     {
         $sender = 123455;
         $curl = curl_init();
 
+
+
         curl_setopt_array($curl, array(
-            CURLOPT_URL => "http://api.iransmsservice.com/v2/sms/send/simple",
+            CURLOPT_URL => env('CURLOPT_URL'),
             CURLOPT_RETURNTRANSFER => true,
             CURLOPT_ENCODING => "",
             CURLOPT_MAXREDIRS => 10,
