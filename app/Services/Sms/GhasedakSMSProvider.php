@@ -2,13 +2,14 @@
 
 namespace App\Services\Sms;
 
+use App\Constants\SmsConstants;
+
 class GhasedakSMSProvider implements SmsInterface
 {
 
 
     public function sendSMS(string $to, string $message): bool
     {
-        $sender = 123455;
         $curl = curl_init();
 
 
@@ -23,7 +24,7 @@ class GhasedakSMSProvider implements SmsInterface
             CURLOPT_CUSTOMREQUEST => "POST",
             CURLOPT_POSTFIELDS => http_build_query(array(
                 'message' => $message,
-                'sender' => $sender,
+                'sender' => SmsConstants::GHASEDAK_SENDER_ID,
                 'Receptor' => $to
             )),
             CURLOPT_HTTPHEADER => array(
