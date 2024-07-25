@@ -21,9 +21,8 @@ class TransactionService
         $this->smsService = $smsService;
     }
 
-    public function transfer(Request $request): \Illuminate\Http\JsonResponse
+    public function transfer(Request $request): array
     {
-
         $sourceCardNumber = $request->input('source_card_number');
         $destinationCardNumber = $request->input('destination_card_number');
         $amount = $request->input('amount');
@@ -44,29 +43,29 @@ class TransactionService
         return $this->executeTransfer($sourceCard, $destinationCard, $amount);
     }
 
-    private function validateTransfer($sourceCardNumber, $destinationCardNumber, $amount): ?\Illuminate\Http\JsonResponse
+    private function validateTransfer($sourceCardNumber, $destinationCardNumber, $amount): ?array
     {
         if ($sourceCardNumber === $destinationCardNumber) {
-            return response()->json(['message' => 'The origin and destination cards cannot be the same.'], 400);
+            return ['status' => 'error', 'message' => 'The origin and destination cards cannot be the same.', 'status_code' => 400];
         }
         if (!$amount || $amount <= 0) {
-            return response()->json(['message' => 'Invalid transfer amount.'], 400);
+            return ['status' => 'error', 'message' => 'Invalid transfer amount.', 'status_code' => 400];
         }
         return null;
     }
 
-    private function validateCardsAndBalance($sourceCard, $destinationCard, $amount): ?\Illuminate\Http\JsonResponse
+    private function validateCardsAndBalance($sourceCard, $destinationCard, $amount): ?array
     {
         if (!$sourceCard || !$destinationCard) {
-            return response()->json(['message' => 'One or both card numbers are not recognized.'], 400);
+            return ['status' => 'error', 'message' => 'One or both card numbers are not recognized.', 'status_code' => 400];
         }
         if ($sourceCard->balance < $amount + TransactionConst::TRANSACTION_FEE) {
-            return response()->json(['message' => 'Insufficient funds.'], 400);
+            return ['status' => 'error', 'message' => 'Insufficient funds.', 'status_code' => 400];
         }
         return null;
     }
 
-    private function executeTransfer($sourceCard, $destinationCard, $amount): \Illuminate\Http\JsonResponse
+    private function executeTransfer($sourceCard, $destinationCard, $amount): array
     {
         try {
             DB::transaction(function () use ($sourceCard, $destinationCard, $amount) {
@@ -75,12 +74,9 @@ class TransactionService
                 $sourceCard->decrementBalance($amount + $transactionFee);
                 $destinationCard->incrementBalance($amount);
 
-
                 $transaction = Transaction::createTransaction($sourceCard->id, $destinationCard->id, $amount);
 
-
                 Fee::createFee($transaction->id, $transactionFee);
-
 
                 try {
                     SendSmsJob::dispatch($sourceCard->account->user->mobile, trans('all.balance_decreased', ['amount' => $amount]));
@@ -90,10 +86,10 @@ class TransactionService
                 }
             });
 
-            return response()->json(['message' => 'Transaction completed successfully.'], 200);
-
+            return ['status' => 'success', 'message' => 'Transaction completed successfully.', 'status_code' => 200];
         } catch (\Exception $e) {
-            return response()->json(['message' => 'Transaction failed. Please try again later.'], 500);
+            Log::error('Transaction failed: ' . $e->getMessage());
+            return ['status' => 'error', 'message' => 'Transaction failed. Please try again later.', 'status_code' => 500];
         }
     }
 }

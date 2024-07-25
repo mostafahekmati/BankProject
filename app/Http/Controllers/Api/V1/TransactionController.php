@@ -20,7 +20,12 @@ class TransactionController extends Controller
 
     public function transfer(TransferRequest $request): \Illuminate\Http\JsonResponse
     {
-        return $this->transactionService->transfer($request);
+
+        $result = $this->transactionService->transfer($request);
+
+        return response()->json([
+            'message' => $result['message'],
+        ], $result['status_code']);
     }
 
 }
