@@ -2,6 +2,7 @@
 
 namespace App\Services\Sms;
 
+use App\Constants\SmsConstants;
 use Illuminate\Support\Facades\Log;
 use Kavenegar\Exceptions\ApiException;
 use Kavenegar\Exceptions\HttpException;
@@ -12,9 +13,6 @@ class KavenegarSMSProvider implements SmsInterface
     protected $api;
 
 
-    const SUCCESS_STATUS = 1;
-    const SENDER_ID = '12345';
-
     public function __construct()
     {
         $this->api = new KavenegarApi(env('KAVENEGAR_API_KEY'));
@@ -24,9 +22,9 @@ class KavenegarSMSProvider implements SmsInterface
     {
         try {
 
-            $response = $this->api->Send(self::SENDER_ID, $to, $message);
+            $response = $this->api->Send(SmsConstants::KAVENEGAR_SENDER_ID, $to, $message);
 
-            return $response[0]?->status === self::SUCCESS_STATUS;
+            return $response[0]?->status === SmsConstants::KAVENEGAR_SUCCESS_STATUS;
         } catch (ApiException|HttpException $e) {
             Log::error('Kavenegar API Exception: ' . $e->getMessage());
             return false;

@@ -14,7 +14,7 @@ use Illuminate\Support\Facades\Log;
 
 class TransactionService
 {
-    protected $smsService;
+    protected SMSService $smsService;
 
     public function __construct(SMSService $smsService)
     {
